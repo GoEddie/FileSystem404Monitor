@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Configuration;
 using System.Text;
@@ -15,8 +16,9 @@ namespace _404
 
     public class FileIOEvent
     {
+        public string Name;
         public string FullPath;
-        public long Status;
+        public int Status;
         public DateTime Time;
         public int PID;
         public string Process;
@@ -42,6 +44,10 @@ namespace _404
 
     public class MissingFile
     {
+        public MissingFile()
+        {
+            Lookups = new List<SearchEvent>();
+        }
         public string Name { get; set; }
         public DateTime LastLookupAttempt { get; set; }
         public string Process { get; set; }
@@ -53,12 +59,15 @@ namespace _404
 
     public class FileMonitor
     {
+        private readonly Dictionary<string, MissingFile> _files = new Dictionary<string, MissingFile>();
         private readonly Action<MissingFile> _displayFile;
+        private readonly Action<MissingFile> _removeFile;
         private readonly EtwEventProvider _provider;
         private readonly FileIOAggregator _fileEventAggregator;
-        public FileMonitor(Action<MissingFile> displayFile)
+        public FileMonitor(Action<MissingFile> displayFile, Action<MissingFile> removeFile)
         {
             _displayFile = displayFile;
+            _removeFile = removeFile;
 
             _fileEventAggregator = new FileIOAggregator(FileEventAvailable);
             _provider = new EtwEventProvider("File404Monitor", "Microsoft-Windows-Kernel-File", 0x10c0, _fileEventAggregator );
@@ -66,44 +75,50 @@ namespace _404
 
         private void FileEventAvailable(FileIOEvent fileIo)
         {
-            Console.WriteLine("FileIO: {0} {1}", fileIo.FullPath, fileIo.RequestType);
+            //Console.WriteLine("FileIO: {0} {1}", fileIo.FullPath, fileIo.RequestType);
+
+            if (fileIo.Status == Success)
+            {   //do we have a not found which is now found?
+                if (_files.ContainsKey(fileIo.Name))
+                {
+                    var file = _files[fileIo.Name];
+                    _removeFile(file);
+                }
+
+                return;
+            }
+
+            if (!_files.ContainsKey(fileIo.Name))
+            {
+                var file = new MissingFile();
+                file.Name = fileIo.Name;
+                file.PID = fileIo.PID;
+                file.Process = fileIo.Process;
+                
+                _files.Add(fileIo.Name, file);
+
+                _displayFile(file);
+            }
+
+            var missingFile = _files[fileIo.Name];
+            missingFile.LastLookupAttempt = fileIo.Time;
+            var searchEvent = new SearchEvent();
+            searchEvent.Path = Path.GetDirectoryName(fileIo.FullPath);
+            searchEvent.Result = fileIo.Status;
+
+            missingFile.Lookups.Insert(0, searchEvent);
+
         }
 
         private bool _continue = false;
         private readonly object _lock = new object();
+        private const long Success = 0x0;
 
         public void Start()
         {
             
                _provider.Start();
             
-            //lock (_lock)
-            //{
-            //    if (_continue)
-            //        return;
-
-            //    _continue = true;
-            //}
-
-            //while (_continue && Sleep(1000))
-            //        _displayFile(new MissingFile()
-            //    {
-            //        LastLookupAttempt = DateTime.Now,
-            //        Lookups =
-            //            new List<SearchEvent>()
-            //            {
-            //                new SearchEvent() {Path = "c:\\dssdlksdlksldks", Result = 0xc000034},
-            //                new SearchEvent() {Path = "c:\\dssdlksdlksldks", Result = 0xc000034},
-            //                new SearchEvent() {Path = "c:\\dssdlksdlksldks", Result = 0xc000034},
-            //                new SearchEvent() {Path = "c:\\dssdlksdlksldks", Result = 0xc000034}
-            //            },
-            //        Name = "Blah",
-            //        PID = 100,
-            //        TID = 1022,
-            //        Process = "dsdssds"
-            //    });
-
-
 
         }
 

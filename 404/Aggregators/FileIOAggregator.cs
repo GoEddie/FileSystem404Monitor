@@ -1,5 +1,6 @@
 ﻿using System;   
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,28 +21,37 @@ namespace _404.Aggregators
 
         public override void TraceEventAvailable(TraceEvent eventData)
         {
-            var irp = eventData.PayloadByName("Irp").ToString();
-
-            if (String.IsNullOrEmpty(irp))
-                return;
-
-            if (eventData.TaskName == "OperationEnd")
+            try
             {
-                if (_operations.ContainsKey(irp))
+                var irp = eventData.PayloadByName("Irp").ToString();
+
+                if (String.IsNullOrEmpty(irp))
+                    return;
+
+                if (eventData.TaskName == "OperationEnd")
                 {
-                    var fileIo = _operations[irp];
-                    _operations.Remove(irp);
-                    long.TryParse(eventData.PayloadByName("Status") as string, out fileIo.Status);
-                    _completed(fileIo);
+                    if (_operations.ContainsKey(irp))
+                    {
+                        var fileIo = _operations[irp];
+                        _operations.Remove(irp);
+                        var status = eventData.PayloadByName("Status") as int?;
+                        fileIo.Status = status ?? -1;
+                        fileIo.Name = Path.GetFileName(fileIo.FullPath);
+                        _completed(fileIo);
+                    }
+
+                    return;
                 }
+                else
+                {
 
-                return;
+                    var fileIo = new FileIOEvent(eventData);
+                    _operations[fileIo.Irp] = fileIo;
+                }
             }
-            else
+            catch (Exception e)
             {
-
-                var fileIo = new FileIOEvent(eventData);
-                _operations[fileIo.Irp] = fileIo;
+                Console.WriteLine(e);
             }
         }
         

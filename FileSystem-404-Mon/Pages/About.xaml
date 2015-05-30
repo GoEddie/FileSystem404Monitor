@@ -9,6 +9,16 @@
       Title="About">
 
     <Grid>
-        
+        <TextBlock TextWrapping="Wrap">
+            FileSystem 404 Monitor - Ed Elliott ed@agilesql.club
+           
+            Wrote this because I sometimes get errors about files not being found or something similar and the app not showing what the name of the file is or what folder 
+            it should be in. I find that I can use process monitor (procmon) but constantly in windows apps look for files that don't exist in each of the search paths but then
+            work find because the file was found in a different directory.
+            
+            What this does is to only show files which have not had a success operation against them, that is all - most of the time this is completely useless but when you need to
+            find a file when it isn't found or you get an access denied or some other error then this tool if for you!
+            
+        </TextBlock>
     </Grid>
 </Page>

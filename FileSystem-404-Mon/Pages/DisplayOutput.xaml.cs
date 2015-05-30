@@ -29,14 +29,22 @@ namespace FileSystem_404_Mon.Pages
     /// </summary>
     public partial class DisplayOutput : Page
     {
-        private const int MaxDisplayedEntries= 5;
+        private const int MaxDisplayedEntries= 1000;
 
         public DisplayOutput()
         {
             InitializeComponent();
 
-            _monitor = new FileMonitor(DisplayFile);
+            _monitor = new FileMonitor(DisplayFile, RemoveFile);
             Files.ItemsSource = _displayFiles;
+        }
+
+        private void RemoveFile(MissingFile file)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                _displayFiles.Remove(file);
+            });
         }
 
         private readonly ObservableCollection<MissingFile> _displayFiles = new ObservableCollection<MissingFile>();

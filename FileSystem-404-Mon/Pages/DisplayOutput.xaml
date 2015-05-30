@@ -37,8 +37,8 @@
 			<ListView BorderThickness="1" x:Name="Lookups">
 				<ListView.View>
 					<GridView>
-						<GridViewColumn Header="Process" DisplayMemberBinding="{Binding Path}" />
-						<GridViewColumn Header="Process" DisplayMemberBinding="{Binding Result}" />
+						<GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}" />
+						<GridViewColumn Header="Result" DisplayMemberBinding="{Binding Result, StringFormat={}{0:x}}" />
 					</GridView>
 				</ListView.View>
 			</ListView>
