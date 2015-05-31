@@ -27,27 +27,35 @@ namespace _404.Etw
 
         public bool Start()
         {
-
-            if (!(TraceEventSession.IsElevated() ?? false))
+            try
             {
-                Console.WriteLine("To turn on ETW events you need to be Administrator, please run from an Admin process.");
+                if (!(TraceEventSession.IsElevated() ?? false))
+                {
+                    Console.WriteLine(
+                        "To turn on ETW events you need to be Administrator, please run from an Admin process.");
+                }
 
+                CreateSession();
+
+                using (var source = new ETWTraceEventSource(_sessionName, TraceEventSourceType.Session))
+                {
+                    RegisterParser(source);
+
+                    if (!EnableProvider())
+                        return false;
+
+                    source.Process();
+
+                }
+
+                return true;
             }
-            
-            CreateSession();
-            
-            using (var source = new ETWTraceEventSource(_sessionName, TraceEventSourceType.Session))
+            catch (Exception e)
             {
-                RegisterParser(source);
-
-                if (!EnableProvider())
-                    return false;
-                
-                source.Process();
-                
+                Console.WriteLine(e);
             }
-            
-            return true;
+
+            return false;
         }
 
         private bool EnableProvider()
@@ -56,7 +64,7 @@ namespace _404.Etw
             
             if (processProviderGuid == Guid.Empty)
             {
-                Console.WriteLine("Error could not find Microsoft-Windows-Kernel-Process etw provider.");
+                Console.WriteLine("Error could not find {0} etw provider.", _provider);
                 return false;
             }
             _session.EnableProvider(processProviderGuid, TraceEventLevel.Verbose, _keywords); /*0x10c0*/

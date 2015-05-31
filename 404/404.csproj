@@ -50,8 +50,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aggregators\FileIOAggregator.cs" />
+    <Compile Include="Aggregators\ProcessAggregator.cs" />
     <Compile Include="Etw\EtwEventProvider.cs" />
+    <Compile Include="FileMonitor.cs" />
     <Compile Include="MissingFile.cs" />
+    <Compile Include="ProcessStore\ProcessNameStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
