@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
+using Diagnostics.Tracing;
 using _404.Aggregators;
 using _404.Etw;
 using _404.ProcessStore;
@@ -72,6 +74,12 @@ namespace _404
 
         public void Start()
         {
+            if (!(TraceEventSession.IsElevated() ?? false))
+            {
+                MessageBox.Show("You must run this elevated to start a trace");
+                return;
+            }
+
             _provider.Start();
         }
         public void Stop()
