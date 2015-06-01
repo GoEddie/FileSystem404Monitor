@@ -1,20 +1,18 @@
-﻿using System;   
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Diagnostics.Tracing;
-using _404.Etw;
 
 namespace _404.Aggregators
 {
-    public class FileIOAggregator : EventAggregator
+    public class FileIoAggregator : EventAggregator
     {
-        private readonly Action<FileIOEvent> _completed;
-        private readonly Dictionary<string, FileIOEvent> _operations = new Dictionary<string, FileIOEvent>();
+        private readonly Action<FileIoEvent> _completed;
+        private readonly Dictionary<string, FileIoEvent> _operations = new Dictionary<string, FileIoEvent>();
+        private const string operationEnd = "OperationEnd";
+        private const string payloadStatus = "Status";
 
-        public FileIOAggregator(Action<FileIOEvent> completed)
+        public FileIoAggregator(Action<FileIoEvent> completed)
         {
             _completed = completed;
         }
@@ -28,24 +26,23 @@ namespace _404.Aggregators
                 if (String.IsNullOrEmpty(irp))
                     return;
 
-                if (eventData.TaskName == "OperationEnd")
+                
+                if (eventData.TaskName == operationEnd)
                 {
                     if (_operations.ContainsKey(irp))
                     {
                         var fileIo = _operations[irp];
                         _operations.Remove(irp);
-                        var status = eventData.PayloadByName("Status") as int?;
+                        
+                        var status = eventData.PayloadByName(payloadStatus) as int?;
                         fileIo.Status = status ?? -1;
                         fileIo.Name = Path.GetFileName(fileIo.FullPath);
                         _completed(fileIo);
                     }
-
-                    return;
                 }
                 else
                 {
-
-                    var fileIo = new FileIOEvent(eventData);
+                    var fileIo = new FileIoEvent(eventData);
                     _operations[fileIo.Irp] = fileIo;
                 }
             }
@@ -54,8 +51,5 @@ namespace _404.Aggregators
                 Console.WriteLine(e);
             }
         }
-        
-
-
     }
 }

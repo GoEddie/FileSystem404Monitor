@@ -1,14 +1,10 @@
 ﻿using System;
 using Diagnostics.Tracing;
 using Diagnostics.Tracing.Parsers;
+using _404.Aggregators;
 
 namespace _404.Etw
 {
-    public abstract class EventAggregator
-    {
-        public abstract void TraceEventAvailable(TraceEvent eventData);
-    }
-    
     public class EtwEventProvider
     {
         private readonly EventAggregator _aggregator;
@@ -67,7 +63,7 @@ namespace _404.Etw
                 Console.WriteLine("Error could not find {0} etw provider.", _provider);
                 return false;
             }
-            _session.EnableProvider(processProviderGuid, TraceEventLevel.Verbose, _keywords); /*0x10c0*/
+            _session.EnableProvider(processProviderGuid, TraceEventLevel.Verbose, _keywords);
             return true;
         }
 
@@ -91,7 +87,14 @@ namespace _404.Etw
 
         ~EtwEventProvider()
         {
-            _session.Dispose();
+            try
+            {
+                _session.Dispose();
+            }
+            catch (Exception)
+            {
+                
+            }
         }
     }
 }

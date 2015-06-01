@@ -6,26 +6,25 @@
       xmlns:local="clr-namespace:FileSystem_404_Mon.Pages"
       xmlns:mui="http://firstfloorsoftware.com/ModernUI"
       mc:Ignorable="d"
-      d:DesignHeight="300" d:DesignWidth="300"
+      d:DesignHeight="300" d:DesignWidth="750"
       Title="DisplayOutput">
 
 	<Grid Style="{StaticResource ContentRoot}">
 
 		<Grid.RowDefinitions>
-			<RowDefinition Height="25" /><RowDefinition /><RowDefinition />
+			<RowDefinition Height="75" /><RowDefinition /><RowDefinition />
 		</Grid.RowDefinitions>
 		<WrapPanel>
 			<Button Width="60" HorizontalAlignment="Left" Margin="5,0,0,0" Click="Start">Start</Button>
 			<Button Width="60" HorizontalAlignment="Left" Margin="5,0,0,0" Click="Stop">Stop</Button>
+            <TextBlock Margin="100,0,0,5">Filter:</TextBlock>
+            <TextBox x:Name="Filter" Width="250" Margin="5,0,0,5" TextChanged="FilterChanged"></TextBox>
 		</WrapPanel>
 
 		<DockPanel Grid.Row="1">
 			<ListView SelectionChanged="ShowSearchedDirectories" BorderThickness="1" FontWeight="Light" FontStyle="Normal" x:Name="Files">
 				<ListView.View>
 					<GridView>
-						<GridViewColumn Header="Process" DisplayMemberBinding="{Binding Process}" />
-						<GridViewColumn Header="PID" DisplayMemberBinding="{Binding PID}" />
-						<GridViewColumn Header="TID" DisplayMemberBinding="{Binding TID}" />
 						<GridViewColumn Header="File Name" DisplayMemberBinding="{Binding Name}" />
 						<GridViewColumn Header="Last Lookup Attempt" DisplayMemberBinding="{Binding LastLookupAttempt}" />
 					</GridView>
@@ -37,9 +36,11 @@
 			<ListView BorderThickness="1" x:Name="Lookups">
 				<ListView.View>
 					<GridView>
-                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Process}" />
+                        <GridViewColumn Header="ProcessId" DisplayMemberBinding="{Binding PID}" />
+                        <GridViewColumn Header="Process" DisplayMemberBinding="{Binding Process}" />
 						<GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}" />
-						<GridViewColumn Header="Result" DisplayMemberBinding="{Binding Result, StringFormat={}{0:x}}" />
+						<GridViewColumn Header="Result" DisplayMemberBinding="{Binding Result, StringFormat={}0x{0:x}}" />
+                        <GridViewColumn Header="Time" DisplayMemberBinding="{Binding EventTime}" />
 					</GridView>
 				</ListView.View>
 			</ListView>

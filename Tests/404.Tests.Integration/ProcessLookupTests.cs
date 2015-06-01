@@ -34,7 +34,7 @@ namespace _404.Tests.Integration
         public void Retrieves_Correct_Process_Name_During_Trace()
         {
             var processStore = new ProcessNameStore();
-            
+            Thread.Sleep(5000);
 
             var process = Process.Start("waitfor", "/T 10 tttttt");
             var eventTime = DateTime.Now;

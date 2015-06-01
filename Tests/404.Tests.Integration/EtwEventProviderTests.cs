@@ -9,6 +9,7 @@ using Diagnostics.Tracing;
 using Diagnostics.Tracing.Parsers;
 using Moq;
 using NUnit.Framework;
+using _404.Aggregators;
 using _404.Etw;
 
 namespace _404.Tests.Integration

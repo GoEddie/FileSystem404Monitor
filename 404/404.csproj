@@ -52,10 +52,17 @@
     <Compile Include="Aggregators\FileIOAggregator.cs" />
     <Compile Include="Aggregators\ProcessAggregator.cs" />
     <Compile Include="Etw\EtwEventProvider.cs" />
+    <Compile Include="Aggregators\EventAggregator.cs" />
+    <Compile Include="FileIoEvent.cs" />
     <Compile Include="FileMonitor.cs" />
     <Compile Include="MissingFile.cs" />
+    <Compile Include="ProcessStore\PidHistory.cs" />
+    <Compile Include="ProcessStore\ProcessName.cs" />
     <Compile Include="ProcessStore\ProcessNameStore.cs" />
+    <Compile Include="ProcessStore\ProcessStartEvent.cs" />
+    <Compile Include="ProcessStore\ProcessStopEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
